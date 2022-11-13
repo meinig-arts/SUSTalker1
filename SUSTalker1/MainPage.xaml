@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-
-    </Grid>
+  <Grid>
+    <Button Content="Speak English" Height="33" Margin="43,31,0,0" VerticalAlignment="Top" Width="111" Click="Button_Click"/>
+  </Grid>
 </Page>
