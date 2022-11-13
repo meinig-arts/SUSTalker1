@@ -16,6 +16,8 @@ using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using Windows.Devices.Enumeration;
 using Windows.Media.Playback;
+using Windows.Storage;
+using Windows.Media.Core;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -51,7 +53,20 @@ namespace SUSTalker1
       }
 
       var synthesizer = new SpeechSynthesizer(myConfig, audioConfig);
-      await synthesizer.SpeakTextAsync("SUS sends its best regards");
+      using (var result = await synthesizer.SpeakTextAsync("Hello from cognitive services."))
+      {
+        if (result.Reason == ResultReason.SynthesizingAudioCompleted)
+        {
+
+          using (var audioStream = AudioDataStream.FromResult(result))
+          {
+            var filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "outputaudio_for_playback.wav");
+            await audioStream.SaveToWaveFileAsync(filePath);
+            mediaPlayer.Source = MediaSource.CreateFromStorageFile(await StorageFile.GetFileFromPathAsync(filePath));
+            mediaPlayer.Play();
+          }
+        }
+      }
     }
   }
 }
