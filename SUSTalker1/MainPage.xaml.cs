@@ -36,7 +36,7 @@ namespace SUSTalker1
     SpeechConfig myConfig;
     MediaPlayer mediaPlayer;
 
-    async private void Button_Click(object sender, RoutedEventArgs e)
+    async private void ButtonEnglish_Click(object sender, RoutedEventArgs e)
     {
       AudioConfig audioConfig = AudioConfig.FromDefaultSpeakerOutput();
       var devices = await DeviceInformation.FindAllAsync(DeviceClass.AudioRender);
@@ -50,8 +50,29 @@ namespace SUSTalker1
         }
       }
 
+      myConfig.SpeechSynthesisVoiceName = "";
       var synthesizer = new SpeechSynthesizer(myConfig, audioConfig);
       await synthesizer.SpeakTextAsync("SUS sends its best regards");
     }
+
+    async private void ButtonGerman_Click(object sender, RoutedEventArgs e)
+    {
+      AudioConfig audioConfig = AudioConfig.FromDefaultSpeakerOutput();
+      var devices = await DeviceInformation.FindAllAsync(DeviceClass.AudioRender);
+
+      // optional part: scan devices for one with a name like "Lautsprecher"
+      foreach (var device in devices)
+      {
+        if (device.Name.Contains("Lautsprecher"))
+        {
+          audioConfig = AudioConfig.FromSpeakerOutput(device.Id);
+        }
+      }
+
+      myConfig.SpeechSynthesisVoiceName = "de-CH-LeniNeural";
+      var synthesizer = new SpeechSynthesizer(myConfig, audioConfig);
+      await synthesizer.SpeakTextAsync("Hallo zusammen");
+    }
+
   }
 }

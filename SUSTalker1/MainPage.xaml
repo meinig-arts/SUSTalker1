@@ -9,6 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
   <Grid>
-    <Button Content="Speak English" Height="33" Margin="43,31,0,0" VerticalAlignment="Top" Width="111" Click="Button_Click"/>
+    <Button Content="Speak English" Height="33" Margin="43,31,0,0" VerticalAlignment="Top" Width="111" Click="ButtonEnglish_Click"/>
+    <Button Content="Speak German" Height="33" Margin="210,31,0,0" VerticalAlignment="Top" Width="111" Click="ButtonGerman_Click"/>
   </Grid>
 </Page>
