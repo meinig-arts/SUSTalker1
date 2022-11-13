@@ -74,5 +74,24 @@ namespace SUSTalker1
       await synthesizer.SpeakTextAsync("Hallo zusammen");
     }
 
+    async private void ButtonStart_Click(object sender, RoutedEventArgs e)
+    { }
+
+    async private void ButtonStop_Click(object sender, RoutedEventArgs e)
+    { }
+
+    async private void ButtonMic_Click(object sender, RoutedEventArgs e)
+    { }
+
+
+    void AppendToLog(String _what)
+    {
+      Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+        TxtRaus.Text = TxtRaus.Text + "/ /" + _what;
+    }
+
+
+
+
   }
 }

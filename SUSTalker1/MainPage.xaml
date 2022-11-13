@@ -11,5 +11,9 @@
   <Grid>
     <Button Content="Speak English" Height="33" Margin="43,31,0,0" VerticalAlignment="Top" Width="111" Click="ButtonEnglish_Click"/>
     <Button Content="Speak German" Height="33" Margin="210,31,0,0" VerticalAlignment="Top" Width="111" Click="ButtonGerman_Click"/>
+    <Button Content="Start" Height="33" Margin="43,136,0,0" VerticalAlignment="Top" Width="111" Click="ButtonStart_Click" IsEnabled="False"/>
+    <Button Content="Stop" Height="33" Margin="210,136,0,0" VerticalAlignment="Top" Width="111" Click="ButtonStop_Click" IsEnabled="False"/>
+    <Button Content="Mic" Height="33" Margin="399,136,0,0" VerticalAlignment="Top" Width="111" Click="ButtonMic_Click"/>
+    <TextBox x:Name="TxtRaus" HorizontalAlignment="Left" Height="130" Margin="43,214,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="467" IsReadOnly="True"/>
   </Grid>
 </Page>
