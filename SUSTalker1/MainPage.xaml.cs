@@ -13,6 +13,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Microsoft.CognitiveServices.Speech;
+using Microsoft.CognitiveServices.Speech.Audio;
+using Windows.Devices.Enumeration;
 using Windows.Media.Playback;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -27,6 +29,8 @@ namespace SUSTalker1
     public MainPage()
     {
       this.InitializeComponent();
+      myConfig = SpeechConfig.FromSubscription("<Key>", "<Loc>");  // your subscription key / location goes here
+      mediaPlayer = new MediaPlayer(); // not yet used.
     }
 
     SpeechConfig myConfig;
@@ -34,6 +38,20 @@ namespace SUSTalker1
 
     async private void Button_Click(object sender, RoutedEventArgs e)
     {
+      AudioConfig audioConfig = AudioConfig.FromDefaultSpeakerOutput();
+      var devices = await DeviceInformation.FindAllAsync(DeviceClass.AudioRender);
+
+      // optional part: scan devices for one with a name like "Lautsprecher"
+      foreach (var device in devices)
+      {
+        if (device.Name.Contains("Lautsprecher"))
+        {
+          audioConfig = AudioConfig.FromSpeakerOutput(device.Id);
+        }
+      }
+
+      var synthesizer = new SpeechSynthesizer(myConfig, audioConfig);
+      await synthesizer.SpeakTextAsync("SUS sends its best regards");
     }
   }
 }
