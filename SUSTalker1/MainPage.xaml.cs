@@ -35,6 +35,7 @@ namespace SUSTalker1
 
     SpeechConfig myConfig;
     MediaPlayer mediaPlayer;
+    SpeechRecognizer speechRecognizer = null;
 
     async private void ButtonEnglish_Click(object sender, RoutedEventArgs e)
     {
@@ -75,10 +76,81 @@ namespace SUSTalker1
     }
 
     async private void ButtonStart_Click(object sender, RoutedEventArgs e)
-    { }
+    {
+      AudioConfig audioConfig = AudioConfig.FromDefaultMicrophoneInput();
+      var devices = await DeviceInformation.FindAllAsync(DeviceClass.AudioCapture);
+      foreach (var device in devices)
+      {
+        if (device.Name.Contains("Mikrofon"))
+        {
+          audioConfig = AudioConfig.FromMicrophoneInput(device.Id);
+        }
+      }
+
+      myConfig.SpeechRecognitionLanguage = "de-DE";
+
+      if (speechRecognizer == null)
+      {
+        speechRecognizer = new SpeechRecognizer(myConfig, audioConfig);
+
+        speechRecognizer.SessionStarted += MyRecWorker_SessionStarted;
+        speechRecognizer.SessionStopped += MyRecWorker_SessionStopped;
+        speechRecognizer.Canceled += MyRecWorker_Canceled;
+        speechRecognizer.Recognized += MyRecWorker_Recognized;
+        speechRecognizer.SpeechStartDetected += MyRecWorker_SpeechStartDetected;
+        speechRecognizer.SpeechEndDetected += MyRecWorker_SpeechEndDetected;
+      }
+
+      speechRecognizer.StartContinuousRecognitionAsync();
+    }
+
+    private void MyRecWorker_SessionStarted(object sender, SessionEventArgs e)
+    {
+      Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+      {
+        ButtonStart.IsEnabled = false;
+        ButtonStop.IsEnabled = true;
+      });
+      AppendToLog("Spracherkennung gestartet");
+    }
+
+    private void MyRecWorker_SessionStopped(object sender, SessionEventArgs e)
+    {
+      Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+      {
+        ButtonStart.IsEnabled = true;
+        ButtonStop.IsEnabled = false;
+      });
+      AppendToLog("Spracherkennung gestoppt");
+    }
+
+    private void MyRecWorker_Canceled(object sender, SpeechRecognitionCanceledEventArgs e)
+    {
+      Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+      {
+        ButtonStart.IsEnabled = true;
+        ButtonStop.IsEnabled = false;
+      });
+      AppendToLog("Spracherkennung abgebrochen:" + e.ErrorDetails);
+
+    }
+    private void MyRecWorker_Recognized(object sender, SpeechRecognitionEventArgs e)
+    {
+      AppendToLog(e.Result.Text);
+    }
+    private void MyRecWorker_SpeechStartDetected(object sender, RecognitionEventArgs e)
+    {
+      AppendToLog("Sprechen beginnt");
+    }
+    private void MyRecWorker_SpeechEndDetected(object sender, RecognitionEventArgs e)
+    {
+      AppendToLog("Sprechpause");
+    }
 
     async private void ButtonStop_Click(object sender, RoutedEventArgs e)
-    { }
+    {
+      speechRecognizer.StopContinuousRecognitionAsync();
+    }
 
     async private void ButtonMic_Click(object sender, RoutedEventArgs e)
     {
