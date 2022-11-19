@@ -117,6 +117,10 @@ namespace SUSTalker1
       if (speechRecognizer == null)
       {
         speechRecognizer = new SpeechRecognizer(myConfig, audioConfig);
+
+        var phraseList = PhraseListGrammar.FromRecognizer(speechRecognizer);
+        phraseList.AddPhrase("Start");
+        phraseList.AddPhrase("Stopp");
       }
 
       ButtonStart.IsEnabled = false; ButtonStop.IsEnabled = false;
