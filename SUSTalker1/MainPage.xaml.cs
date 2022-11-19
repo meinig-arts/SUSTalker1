@@ -34,7 +34,7 @@ namespace SUSTalker1
     {
       this.InitializeComponent();
       myConfig = SpeechConfig.FromSubscription("<Key>", "<Loc>");  // your subscription key / location goes here
-      mediaPlayer = new MediaPlayer(); // not yet used.
+      mediaPlayer = new MediaPlayer();
     }
 
     async private void ButtonEnglish_Click(object sender, RoutedEventArgs e)
@@ -43,10 +43,8 @@ namespace SUSTalker1
       var devices = await DeviceInformation.FindAllAsync(DeviceClass.AudioRender);
 
       // optional part: scan devices for one with a name like "Lautsprecher"
-      foreach (var device in devices)
-      {
-        if (device.Name.Contains("Lautsprecher"))
-        {
+      foreach (var device in devices) {
+        if (device.Name.Contains("Lautsprecher")) {
           audioConfig = AudioConfig.FromSpeakerOutput(device.Id);
         }
       }
@@ -64,8 +62,7 @@ namespace SUSTalker1
       // optional part: scan devices for one with a name like "Lautsprecher"
       foreach (var device in devices)
       {
-        if (device.Name.Contains("Lautsprecher"))
-        {
+        if (device.Name.Contains("Lautsprecher")) {
           audioConfig = AudioConfig.FromSpeakerOutput(device.Id);
         }
       }
@@ -125,14 +122,13 @@ namespace SUSTalker1
 
       ButtonStart.IsEnabled = false; ButtonStop.IsEnabled = false;
       var result = await speechRecognizer.RecognizeOnceAsync().ConfigureAwait(false);
-      Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-      {
+      Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => {
         ButtonStart.IsEnabled = true;
       });
       string str;
-      if (result.Reason != ResultReason.RecognizingSpeech)
+      if (result.Reason != ResultReason.RecognizedSpeech)
       {
-        str = $"Speech Recognition failed:'{result.Reason.ToString()}'";
+        str = $"Speech Recognition failed: '{result.Reason.ToString()}'";
       }
       else
       {
