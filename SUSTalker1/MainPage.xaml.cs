@@ -26,16 +26,16 @@ namespace SUSTalker1
   /// </summary>
   public sealed partial class MainPage : Page
   {
+    SpeechConfig myConfig;
+    MediaPlayer mediaPlayer;
+    SpeechRecognizer speechRecognizer = null;
+
     public MainPage()
     {
       this.InitializeComponent();
       myConfig = SpeechConfig.FromSubscription("<Key>", "<Loc>");  // your subscription key / location goes here
       mediaPlayer = new MediaPlayer(); // not yet used.
     }
-
-    SpeechConfig myConfig;
-    MediaPlayer mediaPlayer;
-    SpeechRecognizer speechRecognizer = null;
 
     async private void ButtonEnglish_Click(object sender, RoutedEventArgs e)
     {
@@ -72,7 +72,32 @@ namespace SUSTalker1
 
       myConfig.SpeechSynthesisVoiceName = "de-CH-LeniNeural";
       var synthesizer = new SpeechSynthesizer(myConfig, audioConfig);
-      await synthesizer.SpeakTextAsync("Hallo zusammen");
+      await synthesizer.SpeakTextAsync("Das ist ein etwas längerer Text, der in Schweitzerdeutsch gesprochen wird.");
+    }
+
+    async private void ButtonMic_Click(object sender, RoutedEventArgs e)
+    {
+      bool isMicAvailable = true;
+      try
+      {
+        var mediaCapture = new Windows.Media.Capture.MediaCapture();
+        var settings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
+        settings.StreamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.Audio;
+        await mediaCapture.InitializeAsync(settings);
+      }
+      catch (Exception)
+      {
+        isMicAvailable = false;
+      }
+
+      if (!isMicAvailable)
+      {
+        await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-microphone"));
+      }
+      else
+      {
+        ButtonStart.IsEnabled = true;
+      }
     }
 
     async private void ButtonStart_Click(object sender, RoutedEventArgs e)
@@ -104,6 +129,11 @@ namespace SUSTalker1
       speechRecognizer.StartContinuousRecognitionAsync();
     }
 
+    async private void ButtonStop_Click(object sender, RoutedEventArgs e)
+    {
+      speechRecognizer.StopContinuousRecognitionAsync();
+    }
+
     private void MyRecWorker_SessionStarted(object sender, SessionEventArgs e)
     {
       Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -132,7 +162,6 @@ namespace SUSTalker1
         ButtonStop.IsEnabled = false;
       });
       AppendToLog("Spracherkennung abgebrochen:" + e.ErrorDetails);
-
     }
     private void MyRecWorker_Recognized(object sender, SpeechRecognitionEventArgs e)
     {
@@ -147,45 +176,10 @@ namespace SUSTalker1
       AppendToLog("Sprechpause");
     }
 
-    async private void ButtonStop_Click(object sender, RoutedEventArgs e)
-    {
-      speechRecognizer.StopContinuousRecognitionAsync();
-    }
-
-    async private void ButtonMic_Click(object sender, RoutedEventArgs e)
-    {
-      bool isMicAvailable = true;
-      try
-      {
-        var mediaCapture = new Windows.Media.Capture.MediaCapture();
-        var settings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
-        settings.StreamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.Audio;
-        await mediaCapture.InitializeAsync(settings);
-       }
-      catch (Exception)
-      {
-        isMicAvailable = false;
-      }
-
-      if (!isMicAvailable)
-      {
-        await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-microphone"));
-      }
-      else
-      {
-        ButtonStart.IsEnabled = true;
-      }
-    }
-
-
     void AppendToLog(String _what)
     {
       Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
         TxtRaus.Text = TxtRaus.Text + "/ /" + _what);
     }
-
-
-
-
   }
 }
