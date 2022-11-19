@@ -117,63 +117,28 @@ namespace SUSTalker1
       if (speechRecognizer == null)
       {
         speechRecognizer = new SpeechRecognizer(myConfig, audioConfig);
-
-        speechRecognizer.SessionStarted += MyRecWorker_SessionStarted;
-        speechRecognizer.SessionStopped += MyRecWorker_SessionStopped;
-        speechRecognizer.Canceled += MyRecWorker_Canceled;
-        speechRecognizer.Recognized += MyRecWorker_Recognized;
-        speechRecognizer.SpeechStartDetected += MyRecWorker_SpeechStartDetected;
-        speechRecognizer.SpeechEndDetected += MyRecWorker_SpeechEndDetected;
       }
 
-      speechRecognizer.StartContinuousRecognitionAsync();
+      ButtonStart.IsEnabled = false; ButtonStop.IsEnabled = false;
+      var result = await speechRecognizer.RecognizeOnceAsync().ConfigureAwait(false);
+      Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+      {
+        ButtonStart.IsEnabled = true;
+      });
+      string str;
+      if (result.Reason != ResultReason.RecognizingSpeech)
+      {
+        str = $"Speech Recognition failed:'{result.Reason.ToString()}'";
+      }
+      else
+      {
+        str = result.Text;
+      }
+      AppendToLog(str);
     }
 
     async private void ButtonStop_Click(object sender, RoutedEventArgs e)
     {
-      speechRecognizer.StopContinuousRecognitionAsync();
-    }
-
-    private void MyRecWorker_SessionStarted(object sender, SessionEventArgs e)
-    {
-      Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-      {
-        ButtonStart.IsEnabled = false;
-        ButtonStop.IsEnabled = true;
-      });
-      AppendToLog("Spracherkennung gestartet");
-    }
-
-    private void MyRecWorker_SessionStopped(object sender, SessionEventArgs e)
-    {
-      Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-      {
-        ButtonStart.IsEnabled = true;
-        ButtonStop.IsEnabled = false;
-      });
-      AppendToLog("Spracherkennung gestoppt");
-    }
-
-    private void MyRecWorker_Canceled(object sender, SpeechRecognitionCanceledEventArgs e)
-    {
-      Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-      {
-        ButtonStart.IsEnabled = true;
-        ButtonStop.IsEnabled = false;
-      });
-      AppendToLog("Spracherkennung abgebrochen:" + e.ErrorDetails);
-    }
-    private void MyRecWorker_Recognized(object sender, SpeechRecognitionEventArgs e)
-    {
-      AppendToLog(e.Result.Text);
-    }
-    private void MyRecWorker_SpeechStartDetected(object sender, RecognitionEventArgs e)
-    {
-      AppendToLog("Sprechen beginnt");
-    }
-    private void MyRecWorker_SpeechEndDetected(object sender, RecognitionEventArgs e)
-    {
-      AppendToLog("Sprechpause");
     }
 
     void AppendToLog(String _what)
